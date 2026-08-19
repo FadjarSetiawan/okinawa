@@ -1,15 +1,15 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home2/kaizorat/okinawa.kaizoratech.com/
+    - export DEPLOYPATH=/home2/kaizorat/okinawa.kaizoratech.com
     - /bin/mkdir -p $DEPLOYPATH
-    - /bin/cp -R index.html $DEPLOYPATH
-    - /bin/cp -R admin.html $DEPLOYPATH
-    - /bin/cp -R server.js $DEPLOYPATH
-    - /bin/cp -R package.json $DEPLOYPATH
-    - /bin/cp -R robots.txt $DEPLOYPATH
-    - /bin/cp -R sitemap.xml $DEPLOYPATH
-    - /bin/cp -R favicon.svg $DEPLOYPATH
-    - /bin/cp -R favicon.ico $DEPLOYPATH
-    - /bin/cp -R .htaccess $DEPLOYPATH 2>/dev/null || :
-    - /bin/cp -R assets $DEPLOYPATH
+    - /bin/cp -R index.html $DEPLOYPATH/
+    - /bin/cp -R admin.html $DEPLOYPATH/
+    - /bin/cp -R server.js $DEPLOYPATH/
+    - /bin/cp -R package.json $DEPLOYPATH/
+    - /bin/cp -R robots.txt $DEPLOYPATH/
+    - /bin/cp -R sitemap.xml $DEPLOYPATH/
+    - /bin/cp -R favicon.svg $DEPLOYPATH/
+    - /bin/cp -R favicon.ico $DEPLOYPATH/
+    - /bin/cp -R .htaccess $DEPLOYPATH/
+    - /bin/cp -R assets $DEPLOYPATH/

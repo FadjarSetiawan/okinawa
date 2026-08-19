@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADMIN HUB | OKINAWA WEBSITE (okinawa@kaizoratech.com)</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            studio: {
+              dark: '#222222',
+              surface: '#1A1A1A',
+              light: '#FFFFFF',
+              warm: '#F5F1E9',
+              warmSurface: '#EDE7DC',
+              borderDark: 'rgba(255, 255, 255, 0.12)',
+              borderLight: 'rgba(34, 34, 34, 0.12)',
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans JP"', 'sans-serif'],
+            serif: ['"Shippori Mincho"', 'serif'],
+            en: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom CSS for Admin -->
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- Alpine.js -->
+  <script defer src="https://unpkg.com/alpinejs@3.13.10/dist/cdn.min.js"></script>
+</head>
+<body x-data="adminApp()" x-init="init()" class="bg-studio-warm text-studio-dark font-sans min-h-screen flex flex-col antialiased">
+
+  <!-- PIN Protection Modal (Bilingual JP / EN) -->
+  <div x-show="!isAuthenticated" class="fixed inset-0 z-50 bg-studio-dark/95 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white p-8 sm:p-10 max-w-md w-full border border-studio-borderLight shadow-2xl">
+      <div class="text-center mb-6">
+        <span class="font-en text-xs tracking-widest text-studio-muted uppercase block">STUDIO INBOX HUB</span>
+        <h1 class="font-serif-jp text-2xl font-bold text-studio-dark mt-1">
+          管理者ログイン <span class="text-base font-normal font-en opacity-70">/ Admin Login</span>
+        </h1>
+        <p class="text-xs text-studio-muted mt-2">
+          okinawa@kaizoratech.com お問い合わせ管理 / Inquiry Desk
+        </p>
+      </div>
+
+      <form @submit.prevent="verifyPin()" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-studio-dark uppercase font-en tracking-wider mb-1">
+            管理者PINコード <span class="font-normal opacity-70">/ Admin PIN Code</span>
+          </label>
+          <input type="password" x-model="pinInput" placeholder="PINを入力 / Enter PIN (初期値: okinawa2026)" class="editorial-input text-center text-lg tracking-widest" autofocus>
+        </div>
+        <p x-show="pinError" class="text-xs text-red-600 text-center">
+          PINコードが正しくありません / Invalid PIN Code
+        </p>
+        <button type="submit" class="btn-editorial-dark w-full py-3.5 text-xs font-medium">
+          管理画面を開く / Open Dashboard →
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Authenticated Admin Interface (Bilingual JP / EN) -->
+  <div x-show="isAuthenticated" class="flex-1 flex flex-col">
+    
+    <!-- Top Studio Header -->
+    <header class="bg-studio-dark text-white border-b border-studio-borderDark px-6 sm:px-10 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40">
+      <div class="flex items-center gap-6">
+        <a href="/" class="flex flex-col">
+          <span class="font-en font-bold text-sm tracking-[0.2em] uppercase">OKINAWA WEBSITE</span>
+          <span class="text-[10px] tracking-[0.2em] text-white/50 uppercase font-en">INQUIRY HUB &amp; EMAIL DESK / お問い合わせハブ</span>
+        </a>
+        <span class="hidden sm:inline-block px-2.5 py-0.5 bg-white/10 border border-white/20 text-[11px] font-en tracking-wider text-white/80">
+          okinawa@kaizoratech.com
+        </span>
+      </div>
+
+      <div class="flex items-center gap-4 text-xs font-en">
+        <button @click="fetchInquiries()" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 transition-colors flex items-center gap-2">
+          <span>↻</span>
+          <span>REFRESH / 更新</span>
+        </button>
+        <a href="/" target="_blank" class="px-3 py-1.5 border border-white/20 hover:bg-white/10 transition-colors">
+          VISIT SITE / サイト閲覧 ↗
+        </a>
+        <button @click="logout()" class="text-white/60 hover:text-white transition-colors">
+          LOGOUT / ログアウト
+        </button>
+      </div>
+    </header>
+
+    <!-- Sub Header Stats (Bilingual JP / EN) -->
+    <div class="bg-white border-b border-studio-borderLight px-6 sm:px-10 py-4">
+      <div class="max-w-[1440px] mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4">
+        
+        <div class="p-3 bg-studio-warm border border-studio-borderLight">
+          <span class="text-[11px] text-studio-muted font-bold block">
+            未読のお問い合わせ <span class="font-normal font-en opacity-75">/ Unread</span>
+          </span>
+          <span class="font-en text-2xl font-extrabold text-studio-dark" x-text="stats.unread || 0"></span>
+        </div>
+
+        <div class="p-3 bg-studio-warm border border-studio-borderLight">
+          <span class="text-[11px] text-studio-muted font-bold block">
+            総お問い合わせ件数 <span class="font-normal font-en opacity-75">/ Total</span>
+          </span>
+          <span class="font-en text-2xl font-extrabold text-studio-dark" x-text="stats.total || 0"></span>
+        </div>
+
+        <div class="p-3 bg-studio-warm border border-studio-borderLight">
+          <span class="text-[11px] text-studio-muted font-bold block">
+            返信・対応済み <span class="font-normal font-en opacity-75">/ Replied</span>
+          </span>
+          <span class="font-en text-2xl font-extrabold text-studio-dark" x-text="stats.replied || 0"></span>
+        </div>
+
+        <div class="p-3 bg-studio-warm border border-studio-borderLight flex flex-col justify-between">
+          <span class="text-[11px] text-studio-muted font-bold block">
+            送受信ハブアドレス <span class="font-normal font-en opacity-75">/ Hub Mail</span>
+          </span>
+          <span class="font-en text-xs font-bold text-studio-dark truncate">okinawa@kaizoratech.com</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Main Admin Workspace -->
+    <main class="flex-1 max-w-[1440px] w-full mx-auto px-6 sm:px-10 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Left Column: List & Filters (Col 5) -->
+      <div class="lg:col-span-5 bg-white border border-studio-borderLight flex flex-col max-h-[820px]">
+        
+        <!-- Filter Tabs & Search -->
+        <div class="p-4 border-b border-studio-borderLight space-y-3">
+          
+          <!-- Search Bar -->
+          <div class="relative">
+            <input type="text" x-model="searchQuery" @input.debounce.300ms="fetchInquiries()" placeholder="名前、会社名、内容で検索 / Search by name, company, content..." class="w-full bg-studio-warm px-3 py-2 text-xs border border-studio-borderLight focus:outline-none focus:border-studio-dark">
+          </div>
+
+          <!-- Tabs (Bilingual JP / EN) -->
+          <div class="flex items-center gap-1 text-xs font-en border-b border-studio-borderLight pb-1">
+            <button @click="setFilter('all')" :class="currentFilter === 'all' ? 'font-bold border-b-2 border-studio-dark text-studio-dark' : 'text-studio-muted'" class="px-2.5 py-1 transition-colors">
+              すべて / ALL (<span x-text="inquiries.length"></span>)
+            </button>
+            <button @click="setFilter('unread')" :class="currentFilter === 'unread' ? 'font-bold border-b-2 border-studio-dark text-studio-dark' : 'text-studio-muted'" class="px-2.5 py-1 transition-colors">
+              未読 / UNREAD
+            </button>
+            <button @click="setFilter('replied')" :class="currentFilter === 'replied' ? 'font-bold border-b-2 border-studio-dark text-studio-dark' : 'text-studio-muted'" class="px-2.5 py-1 transition-colors">
+              返信済 / REPLIED
+            </button>
+            <button @click="setFilter('starred')" :class="currentFilter === 'starred' ? 'font-bold border-b-2 border-studio-dark text-studio-dark' : 'text-studio-muted'" class="px-2.5 py-1 transition-colors">
+              ★重要 / STARRED
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Inquiries Scrollable List -->
+        <div class="flex-1 overflow-y-auto divide-y divide-studio-borderLight">
+          
+          <template x-if="inquiries.length === 0">
+            <div class="p-8 text-center text-xs text-studio-muted">
+              該当するお問い合わせはありません / No inquiries found.
+            </div>
+          </template>
+
+          <template x-for="item in inquiries" :key="item.id">
+            <div @click="selectInquiry(item)" 
+                 :class="{
+                   'bg-studio-warm/60 border-l-4 border-studio-dark': selectedInquiry && selectedInquiry.id === item.id,
+                   'bg-white': !selectedInquiry || selectedInquiry.id !== item.id,
+                   'font-bold': item.status === 'unread'
+                 }"
+                 class="p-4 hover:bg-studio-warm/40 cursor-pointer transition-colors space-y-1.5">
+              
+              <div class="flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                  <span x-show="item.status === 'unread'" class="w-2 h-2 bg-studio-dark rounded-full inline-block"></span>
+                  <span class="font-serif-jp text-sm text-studio-dark" x-text="item.name"></span>
+                  <span x-show="item.company" class="text-studio-muted text-xs font-normal" x-text="'(' + item.company + ')'"></span>
+                </div>
+                <span class="font-en text-[11px] text-studio-muted" x-text="formatDate(item.created_at)"></span>
+              </div>
+
+              <div class="flex items-center gap-2 text-[11px]">
+                <span class="px-1.5 py-0.5 bg-studio-warm border border-studio-borderLight text-studio-dark" x-text="item.plan"></span>
+                <span class="text-studio-muted" x-text="item.budget"></span>
+                <span x-show="item.is_starred" class="text-amber-500 font-bold ml-auto">★</span>
+              </div>
+
+              <p class="text-xs text-studio-muted truncate font-normal" x-text="item.message"></p>
+            </div>
+          </template>
+
+        </div>
+
+      </div>
+
+
+      <!-- Right Column: Inquiry Detailed View & Action Hub (Col 7) -->
+      <div class="lg:col-span-7 bg-white border border-studio-borderLight p-6 sm:p-8">
+        
+        <template x-if="!selectedInquiry">
+          <div class="py-24 text-center text-xs text-studio-muted space-y-2">
+            <p class="font-serif-jp text-sm text-studio-dark">
+              左側の一覧からお問い合わせを選択してください / Please select an inquiry from the list.
+            </p>
+            <p>
+              顧客詳細の確認、返信メールの下書き作成、ステータス変更が行えます。<br>
+              <span class="font-en text-[11px] opacity-75">You can view customer details, draft reply emails, and manage statuses.</span>
+            </p>
+          </div>
+        </template>
+
+        <template x-if="selectedInquiry">
+          <div class="space-y-6">
+            
+            <!-- Detail Header -->
+            <div class="flex flex-wrap items-start justify-between gap-4 pb-6 border-b border-studio-borderLight">
+              <div>
+                <div class="flex items-center gap-3">
+                  <h2 class="font-serif-jp text-2xl font-bold text-studio-dark" x-text="selectedInquiry.name"></h2>
+                  <button @click="toggleStar(selectedInquiry)" class="text-base text-studio-muted hover:text-amber-500 transition-colors" title="スター切り替え / Toggle Star">
+                    <span x-text="selectedInquiry.is_starred ? '★' : '☆'"></span>
+                  </button>
+                </div>
+                <p x-show="selectedInquiry.company" class="text-xs font-medium text-studio-dark mt-0.5" x-text="selectedInquiry.company"></p>
+                <div class="flex flex-wrap items-center gap-4 text-xs font-en text-studio-muted mt-2">
+                  <span>EMAIL / メール: <a :href="'mailto:' + selectedInquiry.email" class="underline text-studio-dark font-medium" x-text="selectedInquiry.email"></a></span>
+                  <span x-show="selectedInquiry.phone">TEL / 電話: <span x-text="selectedInquiry.phone" class="text-studio-dark"></span></span>
+                  <span>DATE / 日時: <span x-text="selectedInquiry.created_at"></span></span>
+                </div>
+              </div>
+
+              <!-- Status Switcher (Bilingual JP / EN) -->
+              <div class="flex items-center gap-2">
+                <select x-model="selectedInquiry.status" @change="updateStatus(selectedInquiry)" class="text-xs bg-studio-warm border border-studio-borderLight px-3 py-1.5 focus:outline-none cursor-pointer font-en">
+                  <option value="unread">● 未読 / Unread</option>
+                  <option value="read">○ 既読・確認中 / Reviewing</option>
+                  <option value="replied">✓ 返信済み / Replied</option>
+                  <option value="archived">✕ アーカイブ / Archived</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Inquired Meta Boxes (Bilingual JP / EN) -->
+            <div class="grid grid-cols-2 gap-4 text-xs">
+              <div class="p-3 bg-studio-warm border border-studio-borderLight">
+                <span class="text-studio-muted block mb-0.5">
+                  ご希望プラン <span class="font-en opacity-75">/ Desired Plan</span>
+                </span>
+                <span class="font-bold text-studio-dark text-sm" x-text="selectedInquiry.plan"></span>
+              </div>
+              <div class="p-3 bg-studio-warm border border-studio-borderLight">
+                <span class="text-studio-muted block mb-0.5">
+                  ご予算の目安 <span class="font-en opacity-75">/ Budget Range</span>
+                </span>
+                <span class="font-bold text-studio-dark text-sm" x-text="selectedInquiry.budget"></span>
+              </div>
+            </div>
+
+            <!-- Message Body -->
+            <div class="space-y-2">
+              <span class="text-xs font-bold text-studio-dark tracking-wider uppercase font-en">
+                INQUIRY CONTENT / ご相談内容
+              </span>
+              <div class="p-5 bg-studio-warm/40 border border-studio-borderLight text-sm text-studio-dark leading-relaxed whitespace-pre-wrap font-sans" x-text="selectedInquiry.message"></div>
+            </div>
+
+            <!-- One-Click Mail Reply Hub (Bilingual JP / EN) -->
+            <div class="p-5 bg-studio-dark text-white border border-studio-borderDark space-y-3">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h4 class="font-serif-jp text-sm font-bold">
+                    返信メール作成ハブ <span class="font-en font-normal text-xs opacity-75">/ Quick Reply Mail Generator</span>
+                  </h4>
+                  <p class="text-[11px] text-white/60 font-en">
+                    FROM: okinawa@kaizoratech.com (直接返信 / Direct Mail Client)
+                  </p>
+                </div>
+                <a :href="generateMailtoLink(selectedInquiry)" @click="markAsReplied(selectedInquiry)" class="btn-editorial-light text-xs py-2 px-5 font-bold text-center">
+                  メールソフトで返信を開く / Open in Mail Client →
+                </a>
+              </div>
+              <p class="text-[11px] text-white/50 border-t border-white/10 pt-2">
+                ※ クリックすると、丁寧な日本語の返信テンプレート（件名・宛名・挨拶・署名付き）が入力された状態でメールソフトが起動します。<br>
+                <span class="font-en text-[10px] opacity-80">Clicking will open your default email client with a pre-formatted polite Japanese business reply template.</span>
+              </p>
+            </div>
+
+            <!-- Admin Internal Notes (Bilingual JP / EN) -->
+            <div class="space-y-2 pt-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-studio-dark tracking-wider uppercase font-en">
+                  INTERNAL NOTES / 社内管理メモ
+                </span>
+                <button @click="saveNotes(selectedInquiry)" class="text-xs font-bold text-studio-dark underline hover:opacity-75">
+                  メモを保存 / Save Notes
+                </button>
+              </div>
+              <textarea x-model="selectedInquiry.admin_notes" rows="3" placeholder="ヒアリングメモ、見積もり金額、次回連絡予定などを記録できます（顧客には見えません） / Record hearing notes, quotations, or follow-up schedules here (Not visible to customer)." class="w-full bg-studio-warm p-3 text-xs border border-studio-borderLight focus:outline-none focus:border-studio-dark resize-none"></textarea>
+            </div>
+
+            <!-- Delete Action (Bilingual JP / EN) -->
+            <div class="pt-4 border-t border-studio-borderLight flex justify-between items-center text-xs font-en">
+              <span class="text-studio-muted">ID: #<span x-text="selectedInquiry.id"></span></span>
+              <button @click="deleteInquiry(selectedInquiry)" class="text-red-600 hover:underline">
+                このお問い合わせを削除 / Delete this Inquiry
+              </button>
+            </div>
+
+          </div>
+        </template>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script>
+    function adminApp() {
+      return {
+        isAuthenticated: false,
+        pinInput: '',
+        pinError: false,
+        inquiries: [],
+        stats: {},
+        selectedInquiry: null,
+        currentFilter: 'all',
+        searchQuery: '',
+
+        init() {
+          if (localStorage.getItem('okinawa_admin_auth') === 'true') {
+            this.isAuthenticated = true;
+            this.fetchInquiries();
+          }
+        },
+
+        verifyPin() {
+          // Default Studio Admin PIN
+          if (this.pinInput === 'okinawa2026' || this.pinInput === 'kaizora2026') {
+            this.isAuthenticated = true;
+            this.pinError = false;
+            localStorage.setItem('okinawa_admin_auth', 'true');
+            this.fetchInquiries();
+          } else {
+            this.pinError = true;
+          }
+        },
+
+        logout() {
+          localStorage.removeItem('okinawa_admin_auth');
+          this.isAuthenticated = false;
+          this.pinInput = '';
+        },
+
+        async fetchInquiries() {
+          try {
+            let url = `/api/inquiries?filter=${this.currentFilter}`;
+            if (this.searchQuery) {
+              url += `&search=${encodeURIComponent(this.searchQuery)}`;
+            }
+            const res = await fetch(url);
+            const data = await res.json();
+            this.inquiries = data.inquiries || [];
+            this.stats = data.stats || {};
+
+            if (this.inquiries.length > 0 && !this.selectedInquiry) {
+              this.selectedInquiry = this.inquiries[0];
+            } else if (this.selectedInquiry) {
+              const found = this.inquiries.find(i => i.id === this.selectedInquiry.id);
+              if (found) this.selectedInquiry = found;
+            }
+          } catch (e) {
+            console.error('Failed to fetch inquiries:', e);
+          }
+        },
+
+        setFilter(filter) {
+          this.currentFilter = filter;
+          this.fetchInquiries();
+        },
+
+        selectInquiry(item) {
+          this.selectedInquiry = item;
+          if (item.status === 'unread') {
+            item.status = 'read';
+            this.updateStatus(item);
+          }
+        },
+
+        async updateStatus(item) {
+          try {
+            await fetch(`/api/inquiries/${item.id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: item.status })
+            });
+            this.fetchInquiries();
+          } catch (e) {
+            console.error('Failed to update status:', e);
+          }
+        },
+
+        async toggleStar(item) {
+          item.is_starred = item.is_starred ? 0 : 1;
+          try {
+            await fetch(`/api/inquiries/${item.id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ is_starred: item.is_starred })
+            });
+            this.fetchInquiries();
+          } catch (e) {
+            console.error('Failed to toggle star:', e);
+          }
+        },
+
+        async saveNotes(item) {
+          try {
+            await fetch(`/api/inquiries/${item.id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ admin_notes: item.admin_notes })
+            });
+            alert('社内メモを保存しました / Internal notes saved successfully.');
+          } catch (e) {
+            console.error('Failed to save notes:', e);
+          }
+        },
+
+        async deleteInquiry(item) {
+          if (!confirm(`「${item.name}」様のお問い合わせを削除しますか？ / Delete inquiry from ${item.name}?`)) return;
+          try {
+            await fetch(`/api/inquiries/${item.id}`, { method: 'DELETE' });
+            this.selectedInquiry = null;
+            this.fetchInquiries();
+          } catch (e) {
+            console.error('Failed to delete inquiry:', e);
+          }
+        },
+
+        markAsReplied(item) {
+          item.status = 'replied';
+          this.updateStatus(item);
+        },
+
+        generateMailtoLink(item) {
+          const subject = encodeURIComponent(`【OKINAWA WEBSITE】お問い合わせありがとうございます（${item.name} 様）`);
+          const body = encodeURIComponent(
+`${item.name} 様
+
+お世話になっております。
+OKINAWA WEBSITE（オキナワウェブサイト）の担当でございます。
+
+この度は、弊スタジオへのお問い合わせをいただき誠にありがとうございます。
+ご相談いただきました内容について、以下の通り確認いたしました。
+
+───────────────────────────────────
+【ご相談内容 / Inquiry Details】
+ご希望プラン：${item.plan}
+ご予算目安：${item.budget}
+
+${item.message}
+───────────────────────────────────
+
+つきましては、一度オンラインミーティング（ZoomまたはGoogle Meet）にて
+詳しいご要望をお伺いできればと存じます。
+
+ご都合の良い日時を2〜3候補ほどご返信いただけますと幸いです。
+
+何卒よろしくお願い申し上げます。
+
+--------------------------------------------------
+OKINAWA WEBSITE
+Web Design & Art Direction Studio
+URL: https://okinawawebsite.web.id
+Email: okinawa@kaizoratech.com
+--------------------------------------------------`
+          );
+          return `mailto:${item.email}?subject=${subject}&body=${body}`;
+        },
+
+        formatDate(dateStr) {
+          if (!dateStr) return '';
+          const d = new Date(dateStr);
+          return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

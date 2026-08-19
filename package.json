@@ -1,0 +1,21 @@
+{
+  "name": "okinawawebsite",
+  "version": "1.0.0",
+  "description": "OKINAWA WEBSITE - Editorial Japanese Web Design Studio",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "okinawa",
+    "web-design",
+    "japan",
+    "creative-agency"
+  ],
+  "author": "OKINAWA WEBSITE",
+  "license": "ISC",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

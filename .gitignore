@@ -1,0 +1,23 @@
+# Node & Dependency files
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# SQLite & Runtime data (Exclude from public git)
+*.sqlite
+*.sqlite-journal
+*.sqlite3
+*.db
+*.log
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+
+# Environment
+.env
+.env.local

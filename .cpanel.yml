@@ -1,0 +1,11 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/$USER/public_html/
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH/assets
+    - /bin/cp -R index.html $DEPLOYPATH
+    - /bin/cp -R admin.html $DEPLOYPATH
+    - /bin/cp -R server.js $DEPLOYPATH
+    - /bin/cp -R package.json $DEPLOYPATH
+    - /bin/cp -R assets/* $DEPLOYPATH/assets/

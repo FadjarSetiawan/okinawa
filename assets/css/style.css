@@ -1,0 +1,408 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   OKINAWA WEBSITE — Editorial Japanese Design System
+   Color Palette: #222222 (Dark) / #FFFFFF (Light) / #F5F1E9 (Warm)
+   ========================================================================== */
+
+:root {
+  --color-dark: #222222;
+  --color-dark-surface: #1a1a1a;
+  --color-light: #ffffff;
+  --color-warm: #f5f1e9;
+  --color-warm-surface: #ede7dc;
+  --color-muted-gray: #767676;
+  --color-border-dark: rgba(255, 255, 255, 0.12);
+  --color-border-light: rgba(34, 34, 34, 0.12);
+  --color-accent: #222222;
+
+  --font-sans: "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Shippori Mincho", "Yu Mincho", "Hiragino Mincho ProN", serif;
+  --font-en: "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Base resets & typography */
+html {
+  font-family: var(--font-sans);
+  background-color: var(--color-light);
+  color: var(--color-dark);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: auto; /* Handled by Lenis */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  line-height: 1.85;
+  letter-spacing: 0.04em;
+  font-size: 15px;
+  background-color: var(--color-light);
+}
+
+/* Lenis smooth scroll */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Editorial Typography */
+.font-serif-jp {
+  font-family: var(--font-serif);
+}
+
+.font-sans-jp {
+  font-family: var(--font-sans);
+}
+
+.font-en {
+  font-family: var(--font-en);
+}
+
+/* Vertical Japanese text */
+.writing-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 0.15em;
+}
+
+/* Subtle background watermark typography */
+.bg-watermark {
+  position: absolute;
+  font-family: var(--font-en);
+  font-weight: 800;
+  font-size: clamp(4rem, 14vw, 15rem);
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+  user-select: none;
+  pointer-events: none;
+  z-index: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.bg-watermark-light {
+  color: rgba(34, 34, 34, 0.03);
+}
+
+.bg-watermark-dark {
+  color: rgba(255, 255, 255, 0.03);
+}
+
+/* Chapter colors */
+.chapter-light {
+  background-color: var(--color-light);
+  color: var(--color-dark);
+}
+
+.chapter-dark {
+  background-color: var(--color-dark);
+  color: var(--color-light);
+}
+
+.chapter-warm {
+  background-color: var(--color-warm);
+  color: var(--color-dark);
+}
+
+/* Thin Line System */
+.border-fine-dark {
+  border-color: rgba(34, 34, 34, 0.12);
+}
+
+.border-fine-white {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.divider-h {
+  width: 100%;
+  height: 1px;
+  background-color: currentColor;
+  opacity: 0.12;
+}
+
+/* Custom Editorial Arrows & Indicators (Zero Icon Library) */
+.editorial-arrow {
+  display: inline-block;
+  transition: transform 0.4s var(--ease-editorial);
+}
+
+.group:hover .editorial-arrow-right {
+  transform: translateX(6px);
+}
+
+.group:hover .editorial-arrow-diag {
+  transform: translate(4px, -4px);
+}
+
+.editorial-plus {
+  position: relative;
+  width: 14px;
+  height: 14px;
+}
+
+.editorial-plus::before,
+.editorial-plus::after {
+  content: "";
+  position: absolute;
+  background-color: currentColor;
+  transition: transform 0.3s var(--ease-editorial);
+}
+
+.editorial-plus::before {
+  top: 6px;
+  left: 0;
+  width: 14px;
+  height: 1px;
+}
+
+.editorial-plus::after {
+  top: 0;
+  left: 6px;
+  width: 1px;
+  height: 14px;
+}
+
+.editorial-plus.is-open::after {
+  transform: rotate(90deg);
+}
+
+/* Minimalist Button System */
+.btn-editorial-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 36px;
+  background-color: var(--color-dark);
+  color: var(--color-light);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  border-radius: 0px;
+  transition: all 0.3s var(--ease-editorial);
+  border: 1px solid var(--color-dark);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-editorial-dark:hover {
+  background-color: #000000;
+  padding-right: 42px;
+}
+
+.btn-editorial-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 36px;
+  background-color: var(--color-light);
+  color: var(--color-dark);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  border-radius: 0px;
+  transition: all 0.3s var(--ease-editorial);
+  border: 1px solid var(--color-light);
+}
+
+.btn-editorial-light:hover {
+  background-color: #f0ede6;
+  padding-right: 42px;
+}
+
+.btn-editorial-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 15px 32px;
+  background-color: transparent;
+  color: inherit;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  border-radius: 0px;
+  border: 1px solid currentColor;
+  transition: all 0.3s var(--ease-editorial);
+}
+
+.btn-editorial-outline:hover {
+  background-color: rgba(128, 128, 128, 0.1);
+  padding-right: 38px;
+}
+
+/* Image Reveal & Hover Transitions */
+.reveal-img-wrap {
+  overflow: hidden;
+  position: relative;
+}
+
+.reveal-img {
+  transition: transform 0.8s var(--ease-editorial), filter 0.6s ease;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.group:hover .reveal-img {
+  transform: scale(1.03);
+}
+
+/* Oversized Project Numbering */
+.project-num-watermark {
+  font-family: var(--font-en);
+  font-weight: 800;
+  font-size: clamp(6rem, 15vw, 13rem);
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: rgba(255, 255, 255, 0.06);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Custom Editorial Form Inputs */
+.editorial-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(34, 34, 34, 0.2);
+  padding: 14px 0;
+  font-size: 15px;
+  font-family: var(--font-sans);
+  color: var(--color-dark);
+  border-radius: 0;
+  transition: border-color 0.3s ease;
+}
+
+.editorial-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-dark);
+}
+
+.editorial-input::placeholder {
+  color: rgba(34, 34, 34, 0.35);
+}
+
+/* Bespoke Editorial Dropdown System (No OS Defaults) */
+.custom-dropdown-btn {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(34, 34, 34, 0.15);
+  padding: 14px 18px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  color: var(--color-dark);
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.custom-dropdown-btn:hover,
+.custom-dropdown-btn.is-active {
+  border-color: var(--color-dark);
+  background: #faf8f5;
+}
+
+.custom-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(34, 34, 34, 0.15);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  z-index: 50;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.custom-dropdown-item {
+  padding: 12px 18px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  border-bottom: 1px solid rgba(34, 34, 34, 0.05);
+}
+
+.custom-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.custom-dropdown-item:hover {
+  background: #f5f1e9;
+  color: var(--color-dark);
+}
+
+.custom-dropdown-item.is-selected {
+  background: #222222;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* Header dynamic appearance */
+.site-header {
+  transition: background-color 0.4s var(--ease-editorial), color 0.4s var(--ease-editorial), border-color 0.4s var(--ease-editorial);
+}
+
+.site-header.theme-light {
+  background-color: rgba(255, 255, 255, 0.94);
+  color: var(--color-dark);
+  border-bottom: 1px solid rgba(34, 34, 34, 0.08);
+}
+
+.site-header.theme-dark {
+  background-color: rgba(34, 34, 34, 0.94);
+  color: var(--color-light);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.site-header.theme-warm {
+  background-color: rgba(245, 241, 233, 0.94);
+  color: var(--color-dark);
+  border-bottom: 1px solid rgba(34, 34, 34, 0.08);
+}
+
+/* Selection */
+::selection {
+  background-color: #222222;
+  color: #ffffff;
+}
+
+.chapter-dark ::selection {
+  background-color: #ffffff;
+  color: #222222;
+}
+
+/* Subtle Film Grain (CSS Only) */
+.grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}

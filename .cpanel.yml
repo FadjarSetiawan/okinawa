@@ -1,11 +1,13 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/$USER/public_html/
+    - export DEPLOYPATH=/home2/kaizorat/okinawa.kaizoratech.com/
     - /bin/mkdir -p $DEPLOYPATH
     - /bin/mkdir -p $DEPLOYPATH/assets
     - /bin/cp -R index.html $DEPLOYPATH
     - /bin/cp -R admin.html $DEPLOYPATH
     - /bin/cp -R server.js $DEPLOYPATH
     - /bin/cp -R package.json $DEPLOYPATH
+    - /bin/cp -R robots.txt $DEPLOYPATH
+    - /bin/cp -R sitemap.xml $DEPLOYPATH
     - /bin/cp -R assets/* $DEPLOYPATH/assets/

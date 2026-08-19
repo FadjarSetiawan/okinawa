@@ -11,4 +11,5 @@ deployment:
     - /bin/cp -R sitemap.xml $DEPLOYPATH
     - /bin/cp -R favicon.svg $DEPLOYPATH
     - /bin/cp -R favicon.ico $DEPLOYPATH
+    - /bin/cp -R .htaccess $DEPLOYPATH 2>/dev/null || :
     - /bin/cp -R assets $DEPLOYPATH
